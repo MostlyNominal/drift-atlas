@@ -1,0 +1,11 @@
+{
+  "_comment": "Sidecar for each SEM image: data/raw/<sample>/<batch>/sem/<image>.tif.meta.json",
+  "sample_id": "IN718-A",
+  "run_id": "sem-001",
+  "magnification": 500,
+  "detector": "SE",
+  "accelerating_voltage_kV": 15,
+  "working_distance_mm": 10.2,
+  "notes": "satellites visible",
+  "image_path": "data/raw/IN718-A/IN718-A-B01/sem/img001.tif"
+}

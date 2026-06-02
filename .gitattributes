@@ -1,0 +1,6 @@
+# Treat raw binary instrument files and SEM images as Git LFS objects.
+# Enable with: git lfs install && git add .gitattributes
+data/raw/**/*.prb   filter=lfs diff=lfs merge=lfs -text
+data/raw/**/*.tif   filter=lfs diff=lfs merge=lfs -text
+data/raw/**/*.tiff  filter=lfs diff=lfs merge=lfs -text
+*.parquet           filter=lfs diff=lfs merge=lfs -text

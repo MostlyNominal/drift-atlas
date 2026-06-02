@@ -1,0 +1,4 @@
+phase_name,phase_fraction_pct,peak_position_2theta,fwhm,crystallite_size_nm,comment
+gamma-FCC,82.0,43.6,0.18,45.0,
+gamma-prime,12.0,50.8,0.22,30.0,
+oxide-spinel,6.0,35.5,0.30,18.0,surface oxidation

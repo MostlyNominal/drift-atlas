@@ -1,0 +1,64 @@
+{
+  "run_id": "run_4e8d36b10f2f",
+  "sample_id": "IN718-A",
+  "batch_id": "IN718-A-B01",
+  "method": "psd",
+  "metadata": {
+    "material": "IN718",
+    "supplier": "SupplierX",
+    "nominal_psd": "15-45",
+    "conditioning": "as-received",
+    "humidity_pct": 40,
+    "reuse_cycle": 0,
+    "operator": "DI",
+    "instrument": "Malvern MAL12345",
+    "run_datetime": "2026-05-03T09:12",
+    "test_mode": null
+  },
+  "raw_file": {
+    "original_name": "export.csv",
+    "sha256": "c1a3a1e6583639056870a08b91ee92e5c9403de7556710b6bc198dcfc81747df",
+    "path": "raw/IN718-A/IN718-A-B01/psd/export.csv"
+  },
+  "n": 3,
+  "repeats": [
+    {
+      "repeat_index": 1,
+      "record_number": "1",
+      "measurement_dt": "2026-05-03 09:12",
+      "d10": 18.4,
+      "d50": 31.7,
+      "d90": 52.9,
+      "span": 1.0883280757097793,
+      "dispersant": "Air",
+      "stirrer_speed_rpm": 2500.0
+    },
+    {
+      "repeat_index": 2,
+      "record_number": "2",
+      "measurement_dt": "2026-05-03 09:15",
+      "d10": 18.7,
+      "d50": 32.0,
+      "d90": 53.4,
+      "span": 1.084375,
+      "dispersant": "Air",
+      "stirrer_speed_rpm": 2500.0
+    },
+    {
+      "repeat_index": 3,
+      "record_number": "3",
+      "measurement_dt": "2026-05-03 09:18",
+      "d10": 18.2,
+      "d50": 31.5,
+      "d90": 52.6,
+      "span": 1.0920634920634922,
+      "dispersant": "Air",
+      "stirrer_speed_rpm": 2500.0
+    }
+  ],
+  "children": {},
+  "detected": {
+    "n": 3,
+    "delimiter": ","
+  }
+}

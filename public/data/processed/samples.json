@@ -1,0 +1,25 @@
+[
+  {
+    "sample_id": "IN718-A",
+    "material": "IN718",
+    "alloy_spec": "AMS5662",
+    "nominal_psd": "15-45",
+    "supplier": "SupplierX",
+    "production_route": "gas atomised",
+    "batches": [
+      {
+        "batch_id": "IN718-A-B01",
+        "conditioning": "as-received",
+        "humidity_pct": 40,
+        "reuse_cycle": 0,
+        "received_date": "2026-05-01"
+      },
+      {
+        "batch_id": "IN718-A-B02",
+        "conditioning": "conditioned 60RH 48h",
+        "humidity_pct": 60,
+        "reuse_cycle": 0
+      }
+    ]
+  }
+]

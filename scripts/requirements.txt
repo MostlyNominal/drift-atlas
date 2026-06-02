@@ -1,0 +1,4 @@
+# Data-processing pipeline (runs in GitHub Actions, not in the browser)
+numpy>=2.0.0
+pillow>=10.4.0      # SEM thumbnails
+pyarrow>=17.0.0     # optional Parquet output

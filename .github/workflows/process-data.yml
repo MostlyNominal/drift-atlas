@@ -1,0 +1,44 @@
+name: Process raw data
+
+# When new raw files or templates are committed, regenerate the processed
+# JSON the website loads, and commit it back. Raw is never modified.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/raw/**"
+      - "data/templates/**"
+      - "scripts/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install processing deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Process raw -> public/data/processed
+        run: python scripts/process_data.py --raw data/raw --out public/data/processed
+
+      - name: Generate SEM thumbnails
+        run: python scripts/make_thumbnails.py --raw data/raw --out public/data/processed/thumbnails
+
+      - name: Commit processed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/processed
+          git diff --staged --quiet || git commit -m "chore(data): regenerate processed data [skip ci]"
+          git push
