@@ -120,9 +120,9 @@ drift-atlas-web/
 └── docs/                       methods & knowledge base
 ```
 
-## Design rules (non-negotiable)
+## Design rules
 
-1. Works from **GitHub Pages** as a static site — no server, no server DB.
+1. Works from **GitHub Pages** as a static site
 2. Website loads **static data files** generated from raw uploads.
 3. Raw data is **never** modified; processed data is **reproducible**.
 4. Filenames are **not trusted**; user metadata is **authoritative**.
