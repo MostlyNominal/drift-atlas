@@ -66,17 +66,6 @@ same alloy at different PSD · different humidity · different conditioning hist
 
 ## Contributors only — local development
 
-Viewers do not need any of this. If you are developing the app or previewing
-changes locally:
-
-```bash
-npm install
-npm run data        # python scripts/process_data.py  (regenerate processed JSON)
-npm run dev         # local dev server at http://localhost:5173/drift-atlas/
-npm run build       # static build into dist/ (base already set to /drift-atlas/)
-npm run preview     # serve the production build locally
-```
-
 ## Contributors only — adding data
 
 You add data by **committing files to GitHub**, not by running a server:
