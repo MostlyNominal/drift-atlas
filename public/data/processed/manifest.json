@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-06-02T20:40:10.358549+00:00",
+  "n_samples": 1,
+  "n_runs": 3,
+  "methods": [
+    "granutap",
+    "psd"
+  ],
+  "warnings": []
+}

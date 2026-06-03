@@ -1,109 +1,143 @@
-# Drift Atlas
+<div align="center">
 
-**Powder Characterisation Atlas**
+# 🌀 Drift Atlas
 
-Visit the live website:
+**A static-first powder characterisation database, knowledge base and visualisation website for metallic powders.**
 
-https://mostlynominal.github.io/drift-atlas/
+### 👉 Visit the live site: **https://mostlynominal.github.io/drift-atlas/**
 
-Drift Atlas is a static, sample-first atlas for metallic powder characterisation.
-It combines a sample atlas, powder passports, comparison views, method notes, and
-a contributor upload guide.
+*Runs entirely from GitHub Pages — no backend, no server database. Commit raw data → GitHub Actions process it → the browser visualises it.*
 
-Viewers do not install anything. They should visit the GitHub Pages website
-above. They should not run npm, Python, Streamlit, DuckDB, a local server, or
-open `index.html` directly.
+</div>
 
-## Product Model
+---
 
-The centre of Drift Atlas is the sample.
+## ⚠️ How to use this site
 
-Current site structure:
+**Just open the website in your browser:**
 
-- Landing page
-- Sample Atlas
-- Sample Detail / Powder Passport
-- Compare Samples
-- Methods / Knowledge Base
-- Data Upload Guide
-- About
+> ### **https://mostlynominal.github.io/drift-atlas/**
 
-The main journey is:
+Do **not** download the repo and open `index.html` from your computer — it will
+not work that way (the app loads data over HTTP and resolves asset paths against
+the `/drift-atlas/` base). There is **nothing to install**. Anyone can view the
+site by visiting the URL above.
 
-1. Open the website.
-2. Browse powder sample cards.
-3. Open a powder passport.
-4. Review identity, alloy, supplier, batch, state, storage history, PSD, KF,
-   GranuTap, SEM metadata, notes, and future module placeholders.
-5. Compare two or more samples side by side.
-6. Read method and contributor guidance.
+The build/processing steps below are **only for contributors** who want to add
+new data files or develop the app. Viewers never run anything locally.
 
-## Static Data
+---
 
-The browser loads static JSON from:
+## What this is
 
-```text
-public/data/processed/
-  samples.json
-  measurements.json
-  images.json
-  methods.json
+Drift Atlas turns a GitHub repository into a growing, queryable atlas of powder
+characterisation data. You commit raw instrument exports; a GitHub Action
+processes them into clean static JSON; a React/TypeScript single-page app
+(served from GitHub Pages) loads and visualises that JSON **in the browser**.
+
+It is built to answer how powders **drift** — and to compare:
+
+same alloy at different PSD · different humidity · different conditioning history · different suppliers · different batches · different morphology · different chemistry · different XRD phase content · different flowability.
+
+## Architecture (static-first)
+
+```
+ commit raw files ──► GitHub Actions (Python) ──► public/data/processed/*.json ──► GitHub Pages
+   data/raw/**          process_data.py               manifest / summaries           Vite + React + TS
+   + *.meta.json        make_thumbnails.py             runs/<id>.json                 ECharts + Arquero
+                                                       sem.json + thumbnails          (all in-browser)
 ```
 
-Repeats are stored as individual observations in `measurements.json`. The
-browser calculates mean, sample SD, SEM, and n. The UI always displays n, and
-error bars or SD interpretation only apply when n is greater than 1.
+- **No backend.** All querying happens client-side with **Arquero** (and
+  optionally DuckDB-WASM for SQL over Parquet later).
+- **Raw is immutable.** Processed JSON is fully reproducible from raw + scripts.
+- **Metadata is authoritative.** Filenames are labels only.
 
-## Contributor Workflow
+## Tech stack
 
-Contributors update data or code in GitHub:
+| Layer | Choice | Why |
+|-------|--------|-----|
+| Build | **Vite + React 18 + TypeScript** | fastest path to a static SPA on Pages; see spec §2 |
+| Routing | `react-router-dom` **HashRouter** | deep links work on Pages with no server rewrites |
+| Charts | **Apache ECharts** (`echarts-for-react`) | custom error-bar rendering; Plotly.js swappable in `Chart.tsx` |
+| Querying | **Arquero** | in-browser dataframes/joins; no WASM bundle weight for MVP |
+| Processing | **Python** in GitHub Actions | parsers + mean/SD/n + thumbnails |
+| Docs | `/docs` + GitHub Wiki | methods & knowledge base |
 
-1. Edit JSON files or add prepared template data.
-2. Commit and push.
-3. GitHub Pages rebuilds the static site.
-4. Viewers see the update at https://mostlynominal.github.io/drift-atlas/
+## Contributors only — local development
 
-There is no backend and no server database.
+## Contributors only — adding data
 
-## Local Development
+You add data by **committing files to GitHub**, not by running a server:
 
-Local setup is for contributors only:
+1. Drop raw exports + `*.meta.json` sidecars under `data/raw/<sample>/<batch>/<method>/`
+   (see [`data/templates/`](data/templates/README.md)).
+2. Commit and push to `main`.
+3. `process-data.yml` regenerates `public/data/processed/*.json` and commits it back.
+4. `deploy-pages.yml` rebuilds and redeploys the site automatically.
 
-```bash
-npm install
-npm run build
+That's it — no local build, no manual deploy.
+
+## Deployment (one-time repo setup)
+
+The site deploys itself via GitHub Actions. To enable it on a fresh repo:
+
+1. **Name the repository `drift-atlas`** so it serves at
+   `https://<owner>.github.io/drift-atlas/` (this matches the `base` in
+   `vite.config.ts`). For this project that is
+   **https://mostlynominal.github.io/drift-atlas/**.
+2. In **Settings → Pages → Build and deployment**, set **Source = "GitHub Actions"**
+   (not "Deploy from a branch").
+3. Push to `main`. The **Deploy to GitHub Pages** workflow builds with
+   `VITE_BASE=/drift-atlas/` and publishes `dist/`.
+4. Open the live URL. Every subsequent push to `main` redeploys automatically.
+
+> If you fork under a different repo name, change the `base` in `vite.config.ts`
+> (and the workflow's `VITE_BASE`) to `/<your-repo-name>/`.
+
+## Repository layout
+
+```
+drift-atlas-web/
+├── index.html                  # Vite entry
+├── package.json · vite.config.ts · tsconfig.json
+├── .github/workflows/
+│   ├── process-data.yml        # raw → processed JSON (commits back)
+│   └── deploy-pages.yml        # build + deploy to GitHub Pages
+├── src/
+│   ├── App.tsx · main.tsx
+│   ├── lib/      types.ts · data.ts (Arquero) · stats.ts (mean/SD/n rule)
+│   ├── components/ Chart.tsx · SummaryBar.tsx · Common.tsx
+│   └── pages/    Dashboard · SampleExplorer · PSD · KF · GranuTap ·
+│                 GranuDrum · SEM · AZtec · Correlation · Comparison
+├── scripts/
+│   ├── process_data.py · make_thumbnails.py
+│   └── parsers/  common · psd · granutap · granudrum · aztecfeature · dsc_tga · ft4
+├── data/
+│   ├── raw/        immutable raw + *.meta.json (authoritative)
+│   └── templates/  copy-and-fill data entry templates
+├── public/data/processed/      static JSON the site fetches (built by CI)
+└── docs/                       methods & knowledge base
 ```
 
-Optional checks:
+## Design rules
 
-```bash
-npm run test
-npm run typecheck
-```
-
-## GitHub Pages
-
-This is a GitHub Pages project site. The Vite base path must remain:
-
-```text
-/drift-atlas/
-```
-
-`npm run build` must produce `dist/index.html`, and built asset paths should use
-`/drift-atlas/`.
-
-One-time GitHub setting:
-
-- Settings -> Pages -> Build and deployment -> Source: GitHub Actions
+1. Works from **GitHub Pages** as a static site
+2. Website loads **static data files** generated from raw uploads.
+3. Raw data is **never** modified; processed data is **reproducible**.
+4. Filenames are **not trusted**; user metadata is **authoritative**.
+5. Repeats are optional (n = 1, 2, 3+). **Always display n. Error bars only when n > 1.**
 
 ## Roadmap
 
-- MVP: sample atlas, powder passports, compare page, PSD, KF, GranuTap, SEM
-  metadata, method notes, upload guide.
-- Next: GranuDrum / GranuFlow traces.
-- Future: ASEM / AZtecFeature morphology and chemistry, FT4, XRD, DSC/TGA,
-  EBSD notes, correlations, and prediction once the atlas has enough samples.
+- **MVP** — Pages site, static data, sample registry, manual KF, PSD + GranuTap processing, SEM metadata, overview dashboard, mean/SD/n + error bars. *(Scaffolded and building in this repo.)*
+- **v0.2** — GranuDrum/GranuFlow speed-level traces with mean ± SD overlays.
+- **v0.3** — AZtecFeature/ASEM particle morphology + chemistry; ECD-vs-PSD.
+- **v0.4** — FT4 (+`.prb`/CSV), DSC/TGA curves, XRD phases; client-side upload preview.
+- **Future** — DuckDB-WASM SQL over Parquet, SEM feature extraction, correlation matrix, feature importance, flowability prediction.
+
+See [`docs/technical_specification.md`](docs/technical_specification.md) for the full design.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
