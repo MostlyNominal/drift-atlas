@@ -1,0 +1,11 @@
+{
+  "_comment": "Manual KF moisture entry. Place at data/raw/<sample>/<batch>/kf/kf.json. Each repeat stored separately; website shows mean, SD, n. Error bars only when n>1.",
+  "operator": "DI",
+  "instrument": "Mettler C20",
+  "run_datetime": "2026-05-04T11:00",
+  "repeats": [
+    { "repeat_index": 1, "water_content_ppm": 235.0, "sample_mass_g": 1.0123, "comment": "" },
+    { "repeat_index": 2, "water_content_ppm": 241.5, "sample_mass_g": 1.0050, "comment": "" },
+    { "repeat_index": 3, "water_content_ppm": 238.0, "sample_mass_g": 0.9988, "comment": "" }
+  ]
+}
