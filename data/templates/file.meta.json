@@ -1,7 +1,0 @@
-{
-  "_comment": "Generic sidecar for any instrument export: <export>.meta.json. Metadata here is AUTHORITATIVE and overrides anything inside the file or its filename.",
-  "operator": "DI",
-  "instrument": "Malvern MAL12345",
-  "run_datetime": "2026-05-03T09:12",
-  "test_mode": null
-}
