@@ -2,11 +2,16 @@ import { calculateMeanSDN } from "./stats";
 import type {
   AtlasData,
   AtlasImage,
+  GranuDrumSeries,
+  GranuTapCurve,
+  HausnerQualityBand,
   Measurement,
   MethodDefinition,
   MetricDefinition,
   MetricKey,
   MetricStat,
+  PSDCurve,
+  RelationshipRow,
   Sample,
   SampleKeyMetrics,
   SummaryCounts,
@@ -133,15 +138,35 @@ async function getJSON<T>(fileName: string): Promise<T> {
   return data;
 }
 
+async function getOptionalJSON<T>(fileName: string, fallback: T): Promise<T> {
+  try {
+    return await getJSON<T>(fileName);
+  } catch {
+    cache.set(fileName, fallback);
+    return fallback;
+  }
+}
+
 export async function loadAtlasData(): Promise<AtlasData> {
-  const [samples, measurements, images, methods] = await Promise.all([
+  const [
+    samples,
+    measurements,
+    images,
+    methods,
+    psdCurves,
+    granutapCurves,
+    granudrumSeries,
+  ] = await Promise.all([
     getJSON<Sample[]>("samples.json"),
     getJSON<Measurement[]>("measurements.json"),
     getJSON<AtlasImage[]>("images.json"),
     getJSON<MethodDefinition[]>("methods.json"),
+    getOptionalJSON<PSDCurve[]>("psd_curves.json", []),
+    getOptionalJSON<GranuTapCurve[]>("granutap_curves.json", []),
+    getOptionalJSON<GranuDrumSeries[]>("granudrum_series.json", []),
   ]);
 
-  return { samples, measurements, images, methods };
+  return { samples, measurements, images, methods, psdCurves, granutapCurves, granudrumSeries };
 }
 
 export function assetUrl(path: string): string {
@@ -165,6 +190,7 @@ export function getAvailableMethods(
   sampleId: string,
   measurements: Measurement[],
   images: AtlasImage[],
+  granudrumSeries: GranuDrumSeries[] = [],
 ): string[] {
   const methods = new Set(
     measurements
@@ -176,6 +202,10 @@ export function getAvailableMethods(
     methods.add("SEM");
   }
 
+  if (granudrumSeries.some((series) => series.sample_id === sampleId)) {
+    methods.add("GranuDrum");
+  }
+
   return [...methods].sort((a, b) => a.localeCompare(b));
 }
 
@@ -183,11 +213,31 @@ export function getSampleImages(sampleId: string, images: AtlasImage[]): AtlasIm
   return images.filter((image) => image.sample_id === sampleId);
 }
 
+export function getMetricStats(sampleId: string, metricKey: MetricKey, measurements: Measurement[]): MetricStat;
+export function getMetricStats(sampleId: string, method: string, metric: string, measurements: Measurement[]): MetricStat;
 export function getMetricStats(
   sampleId: string,
-  metricKey: MetricKey,
-  measurements: Measurement[],
+  methodOrMetricKey: MetricKey | string,
+  metricOrMeasurements: string | Measurement[],
+  maybeMeasurements?: Measurement[],
 ): MetricStat {
+  if (!Array.isArray(metricOrMeasurements)) {
+    const metricKey = findMetricKey(methodOrMetricKey, metricOrMeasurements) ?? "moisture";
+    const measurements = maybeMeasurements ?? [];
+    const rows = getMetricRepeats(sampleId, methodOrMetricKey, metricOrMeasurements, measurements);
+    const definition = metricDefinitions[metricKey];
+
+    return {
+      ...calculateMeanSDN(rows.map((row) => row.value)),
+      key: metricKey,
+      label: definition.label,
+      unit: rows[0]?.unit ?? definition.unit,
+      values: rows.map((row) => row.value),
+    };
+  }
+
+  const metricKey = methodOrMetricKey as MetricKey;
+  const measurements = metricOrMeasurements;
   const definition = metricDefinitions[metricKey];
   const values = getMetricValues(sampleId, metricKey, measurements);
   return {
@@ -199,10 +249,126 @@ export function getMetricStats(
   };
 }
 
+export function getMetricRepeats(
+  sampleId: string,
+  method: string,
+  metric: string,
+  measurements: Measurement[],
+): { repeat: number; value: number; unit: string; date: string; instrument: string; notes: string }[] {
+  return measurements
+    .filter((measurement) => {
+      return measurement.sample_id === sampleId
+        && measurement.method === method
+        && measurement.metric === metric;
+    })
+    .sort((a, b) => a.repeat - b.repeat)
+    .map((measurement) => ({
+      repeat: measurement.repeat,
+      value: measurement.value,
+      unit: measurement.unit,
+      date: measurement.date,
+      instrument: measurement.instrument,
+      notes: measurement.notes,
+    }));
+}
+
+export function getPSDStats(
+  sampleId: string,
+  measurements: Measurement[],
+): Pick<SampleKeyMetrics, "d10" | "d50" | "d90" | "span"> {
+  return {
+    d10: getMetricStats(sampleId, "d10", measurements),
+    d50: getMetricStats(sampleId, "d50", measurements),
+    d90: getMetricStats(sampleId, "d90", measurements),
+    span: getMetricStats(sampleId, "span", measurements),
+  };
+}
+
+export function getPSDSpan(sampleId: string, measurements: Measurement[]): MetricStat {
+  return getMetricStats(sampleId, "span", measurements);
+}
+
+export function getSamplePSDCurves(sampleId: string, curves: PSDCurve[]): PSDCurve[] {
+  return curves
+    .filter((curve) => curve.sample_id === sampleId)
+    .sort((a, b) => a.repeat - b.repeat);
+}
+
+export function getTapCurveSeries(sampleIds: string[], curves: GranuTapCurve[]): GranuTapCurve[] {
+  const ids = new Set(sampleIds);
+  return curves
+    .filter((curve) => ids.has(curve.sample_id))
+    .sort((a, b) => a.sample_id.localeCompare(b.sample_id) || a.repeat - b.repeat);
+}
+
+export function getSampleGranuDrumSeries(
+  sampleId: string,
+  series: GranuDrumSeries[],
+  testType?: string,
+): GranuDrumSeries[] {
+  return series
+    .filter((row) => row.sample_id === sampleId && (!testType || row.test_type === testType))
+    .sort((a, b) => a.repeat - b.repeat);
+}
+
+export function getRelationshipRows(
+  sampleIds: string[],
+  samples: Sample[],
+  measurements: Measurement[],
+  xMetric: MetricKey,
+  yMetric: MetricKey,
+): RelationshipRow[] {
+  const ids = new Set(sampleIds);
+
+  return samples
+    .filter((sample) => ids.has(sample.sample_id))
+    .map((sample) => {
+      const x = getMetricStats(sample.sample_id, xMetric, measurements);
+      const y = getMetricStats(sample.sample_id, yMetric, measurements);
+
+      return {
+        sample_id: sample.sample_id,
+        display_name: sample.display_name,
+        alloy: sample.alloy,
+        powder_state: sample.powder_state,
+        x: x.mean,
+        y: y.mean,
+        xN: x.n,
+        yN: y.n,
+      };
+    });
+}
+
+export function getHausnerQualityBand(value: number): HausnerQualityBand {
+  if (value <= 1.1) {
+    return { label: "Excellent", min: 1, max: 1.1, color: "#dcefe5" };
+  }
+
+  if (value <= 1.2) {
+    return { label: "Good", min: 1.1, max: 1.2, color: "#eef3cf" };
+  }
+
+  if (value <= 1.25) {
+    return { label: "Passable", min: 1.2, max: 1.25, color: "#f6e3bd" };
+  }
+
+  return { label: "Poor", min: 1.25, max: 1.5, color: "#f2d2cf" };
+}
+
+export function getHausnerQualityBands(): HausnerQualityBand[] {
+  return [
+    { label: "Excellent", min: 1, max: 1.1, color: "#dcefe5" },
+    { label: "Good", min: 1.1, max: 1.2, color: "#eef3cf" },
+    { label: "Passable", min: 1.2, max: 1.25, color: "#f6e3bd" },
+    { label: "Poor", min: 1.25, max: 1.5, color: "#f2d2cf" },
+  ];
+}
+
 export function getSampleKeyMetrics(
   sample: Sample,
   measurements: Measurement[],
   images: AtlasImage[],
+  granudrumSeries: GranuDrumSeries[] = [],
 ): SampleKeyMetrics {
   return {
     d10: getMetricStats(sample.sample_id, "d10", measurements),
@@ -215,7 +381,7 @@ export function getSampleKeyMetrics(
     hausnerRatio: getMetricStats(sample.sample_id, "hausnerRatio", measurements),
     carrIndex: getMetricStats(sample.sample_id, "carrIndex", measurements),
     semImageCount: getSampleImages(sample.sample_id, images).length,
-    availableMethods: getAvailableMethods(sample.sample_id, measurements, images),
+    availableMethods: getAvailableMethods(sample.sample_id, measurements, images, granudrumSeries),
   };
 }
 
@@ -329,6 +495,13 @@ function getMetricValues(
     })
     .sort((a, b) => a.repeat - b.repeat)
     .map((measurement) => measurement.value);
+}
+
+function findMetricKey(method: string, metric: string): MetricKey | undefined {
+  return atlasMetricOrder.find((metricKey) => {
+    const definition = metricDefinitions[metricKey];
+    return definition.method === method && definition.sourceMetric === metric;
+  });
 }
 
 function getDerivedRows(

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   EmptyState,
@@ -11,9 +12,18 @@ import {
 import {
   assetUrl,
   getAvailableMethods,
+  getSampleGranuDrumSeries,
   getSampleImages,
   getSampleKeyMetrics,
+  getSamplePSDCurves,
+  getTapCurveSeries,
 } from "../lib/data";
+import AvalancheBoxPlot from "../components/charts/AvalancheBoxPlot";
+import DensityEvolutionChart from "../components/charts/DensityEvolutionChart";
+import GroupedMetricChart from "../components/charts/GroupedMetricChart";
+import MetricErrorBarChart from "../components/charts/MetricErrorBarChart";
+import PSDCurveChart from "../components/charts/PSDCurveChart";
+import ScientificLineChart from "../components/charts/ScientificLineChart";
 import type { AtlasData, MetricKey, MetricStat, SampleKeyMetrics } from "../lib/types";
 
 export default function SampleDetailPage({ data }: { data: AtlasData }) {
@@ -33,9 +43,17 @@ export default function SampleDetailPage({ data }: { data: AtlasData }) {
     );
   }
 
-  const metrics = getSampleKeyMetrics(sample, data.measurements, data.images);
+  const metrics = getSampleKeyMetrics(sample, data.measurements, data.images, data.granudrumSeries);
   const sampleImages = getSampleImages(sample.sample_id, data.images);
-  const methods = getAvailableMethods(sample.sample_id, data.measurements, data.images);
+  const methods = getAvailableMethods(sample.sample_id, data.measurements, data.images, data.granudrumSeries);
+  const psdCurves = getSamplePSDCurves(sample.sample_id, data.psdCurves);
+  const tapCurves = getTapCurveSeries([sample.sample_id], data.granutapCurves);
+  const avalancheSeries = getSampleGranuDrumSeries(sample.sample_id, data.granudrumSeries, "first_avalanche");
+  const speedSeries = getSampleGranuDrumSeries(sample.sample_id, data.granudrumSeries, "speed_hysteresis")
+    .map((series) => ({
+      name: `${sample.display_name} repeat ${series.repeat}`,
+      points: series.points ?? [],
+    }));
 
   return (
     <article className="passport">
@@ -107,21 +125,89 @@ export default function SampleDetailPage({ data }: { data: AtlasData }) {
         metrics={[metrics.d10, metrics.d50, metrics.d90, metrics.span]}
         sampleId={sample.sample_id}
         measurements={data.measurements}
-      />
+      >
+        <div className="chart-grid">
+          <PSDCurveChart
+            title="PSD Curve"
+            subtitle="Mean volume distribution from available repeat curves."
+            curves={psdCurves}
+            samples={[sample]}
+          />
+          <MetricErrorBarChart
+            title="D-values and Span"
+            subtitle="Repeat-level D10, D50, D90 and calculated span with mean +/- SD."
+            metrics={[metrics.d10, metrics.d50, metrics.d90, metrics.span]}
+            yAxisLabel="Particle size (um) / span"
+          />
+        </div>
+      </MethodSection>
 
       <MethodSection
         title="KF Moisture"
         metrics={[metrics.moisture]}
         sampleId={sample.sample_id}
         measurements={data.measurements}
-      />
+      >
+        <MetricErrorBarChart
+          title="KF Moisture Repeats"
+          subtitle="Individual repeat points with mean +/- SD where n is greater than 1."
+          metrics={[metrics.moisture]}
+          yAxisLabel="Moisture (ppm)"
+        />
+      </MethodSection>
 
       <MethodSection
         title="GranuTap"
         metrics={[metrics.bulkDensity, metrics.tappedDensity, metrics.hausnerRatio, metrics.carrIndex]}
         sampleId={sample.sample_id}
         measurements={data.measurements}
-      />
+      >
+        <div className="chart-grid">
+          {tapCurves.length ? (
+            <DensityEvolutionChart
+              title="Density Evolution"
+              subtitle="Tap-level density curve with dashed initial and final density references."
+              curves={tapCurves}
+              samples={[sample]}
+            />
+          ) : (
+            <GroupedMetricChart
+              title="Bulk vs Tapped Density"
+              subtitle="Fallback grouped density chart when tap-level curves are not available."
+              samples={[sample]}
+              data={data}
+              metricKeys={["bulkDensity", "tappedDensity"]}
+              yAxisLabel="Density (g cm-3)"
+            />
+          )}
+          <MetricErrorBarChart
+            title="Density and Flow Indices"
+            subtitle="Bulk density, tapped density, Hausner ratio and Carr index by repeat."
+            metrics={[metrics.bulkDensity, metrics.tappedDensity, metrics.hausnerRatio, metrics.carrIndex]}
+            yAxisLabel="Density / index"
+          />
+        </div>
+      </MethodSection>
+
+      <Section title="GranuDrum">
+        <div className="chart-grid">
+          <AvalancheBoxPlot
+            title="First Avalanche Angle"
+            subtitle="Boxplot-style spread with median line and mean marker."
+            series={avalancheSeries}
+            samples={[sample]}
+          />
+          <ScientificLineChart
+            title="Speed Hysteresis"
+            subtitle="Dynamic angle vs speed for available up/down speed points."
+            series={speedSeries}
+            xKey="speed_rpm"
+            yKey="dynamic_angle_deg"
+            xAxisLabel="Speed (rpm)"
+            yAxisLabel="Dynamic angle (deg)"
+          />
+        </div>
+      </Section>
 
       <Section title="SEM Images">
         {sampleImages.length ? (
@@ -147,7 +233,7 @@ export default function SampleDetailPage({ data }: { data: AtlasData }) {
 
       <Section title="Future Modules">
         <div className="future-grid">
-          {["GranuDrum / GranuFlow", "FT4 powder rheology", "ASEM / AZtecFeature", "DSC / TGA", "XRD", "EBSD notes"].map((module) => (
+          {["FT4 powder rheology", "ASEM / AZtecFeature", "DSC / TGA", "XRD", "EBSD notes"].map((module) => (
             <EmptyState key={module} title={module}>
               Reserved for future static uploads and method documentation.
             </EmptyState>
@@ -167,14 +253,17 @@ function MethodSection({
   metrics,
   sampleId,
   measurements,
+  children,
 }: {
   title: string;
   metrics: MetricStat[];
   sampleId: string;
   measurements: AtlasData["measurements"];
+  children?: ReactNode;
 }) {
   return (
     <Section title={title}>
+      {children}
       <div className="method-metrics">
         {metrics.map((metric) => (
           <MetricRow

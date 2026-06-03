@@ -31,14 +31,14 @@ export default function SampleAtlasPage({ data }: { data: AtlasData }) {
       suppliers: unique(data.samples.map((sample) => sample.supplier)),
       powderStates: unique(data.samples.map((sample) => sample.powder_state)),
       methods: unique(data.samples.flatMap((sample) => {
-        return getAvailableMethods(sample.sample_id, data.measurements, data.images);
+        return getAvailableMethods(sample.sample_id, data.measurements, data.images, data.granudrumSeries);
       })),
       tags: unique(data.samples.flatMap((sample) => sample.tags)),
     };
   }, [data]);
 
   const filteredSamples = data.samples.filter((sample) => {
-    const methods = getAvailableMethods(sample.sample_id, data.measurements, data.images);
+    const methods = getAvailableMethods(sample.sample_id, data.measurements, data.images, data.granudrumSeries);
     return matches(filters.alloy, sample.alloy)
       && matches(filters.supplier, sample.supplier)
       && matches(filters.powderState, sample.powder_state)
@@ -101,6 +101,7 @@ export default function SampleAtlasPage({ data }: { data: AtlasData }) {
             sample={sample}
             measurements={data.measurements}
             images={data.images}
+            granudrumSeries={data.granudrumSeries}
           />
         ))}
       </section>

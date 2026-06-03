@@ -10,6 +10,7 @@ import {
 } from "../lib/data";
 import type {
   AtlasImage,
+  GranuDrumSeries,
   Measurement,
   MetricKey,
   MetricStat,
@@ -97,12 +98,14 @@ export function SampleCard({
   sample,
   measurements,
   images,
+  granudrumSeries,
 }: {
   sample: Sample;
   measurements: Measurement[];
   images: AtlasImage[];
+  granudrumSeries?: GranuDrumSeries[];
 }) {
-  const metrics = getSampleKeyMetrics(sample, measurements, images);
+  const metrics = getSampleKeyMetrics(sample, measurements, images, granudrumSeries);
 
   return (
     <Link className="sample-card" to={`/samples/${sample.sample_id}`}>

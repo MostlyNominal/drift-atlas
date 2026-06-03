@@ -1,0 +1,64 @@
+[
+  {
+    "sample_id": "IN718-AR",
+    "test_type": "first_avalanche",
+    "repeat": 1,
+    "values": [17.4, 18.1, 19.0, 20.2, 18.8, 19.5]
+  },
+  {
+    "sample_id": "IN718-AR",
+    "test_type": "first_avalanche",
+    "repeat": 2,
+    "values": [17.8, 18.4, 19.2, 20.5, 19.0, 19.7]
+  },
+  {
+    "sample_id": "IN718-COND",
+    "test_type": "first_avalanche",
+    "repeat": 1,
+    "values": [22.5, 24.0, 25.8, 27.2, 26.1, 28.4]
+  },
+  {
+    "sample_id": "IN718-COND",
+    "test_type": "first_avalanche",
+    "repeat": 2,
+    "values": [23.1, 24.4, 26.0, 27.8, 26.5, 28.9]
+  },
+  {
+    "sample_id": "NIALBR-AR",
+    "test_type": "first_avalanche",
+    "repeat": 1,
+    "values": [20.2, 21.5, 22.7, 23.4, 22.9, 24.1]
+  },
+  {
+    "sample_id": "C103-COND",
+    "test_type": "first_avalanche",
+    "repeat": 1,
+    "values": [25.4, 27.1, 28.8, 30.5, 29.7, 31.0]
+  },
+  {
+    "sample_id": "IN718-AR",
+    "test_type": "speed_hysteresis",
+    "repeat": 1,
+    "points": [
+      { "speed_rpm": 2, "dynamic_angle_deg": 35.4, "cohesion_index": 4.2, "direction": "up" },
+      { "speed_rpm": 5, "dynamic_angle_deg": 36.8, "cohesion_index": 4.7, "direction": "up" },
+      { "speed_rpm": 10, "dynamic_angle_deg": 38.2, "cohesion_index": 5.1, "direction": "up" },
+      { "speed_rpm": 10, "dynamic_angle_deg": 37.7, "cohesion_index": 5.0, "direction": "down" },
+      { "speed_rpm": 5, "dynamic_angle_deg": 36.1, "cohesion_index": 4.5, "direction": "down" },
+      { "speed_rpm": 2, "dynamic_angle_deg": 34.9, "cohesion_index": 4.1, "direction": "down" }
+    ]
+  },
+  {
+    "sample_id": "IN718-COND",
+    "test_type": "speed_hysteresis",
+    "repeat": 1,
+    "points": [
+      { "speed_rpm": 2, "dynamic_angle_deg": 38.9, "cohesion_index": 6.1, "direction": "up" },
+      { "speed_rpm": 5, "dynamic_angle_deg": 40.4, "cohesion_index": 6.8, "direction": "up" },
+      { "speed_rpm": 10, "dynamic_angle_deg": 42.2, "cohesion_index": 7.4, "direction": "up" },
+      { "speed_rpm": 10, "dynamic_angle_deg": 41.5, "cohesion_index": 7.1, "direction": "down" },
+      { "speed_rpm": 5, "dynamic_angle_deg": 39.8, "cohesion_index": 6.5, "direction": "down" },
+      { "speed_rpm": 2, "dynamic_angle_deg": 38.2, "cohesion_index": 5.9, "direction": "down" }
+    ]
+  }
+]

@@ -55,6 +55,7 @@ export default function LandingPage({ data }: { data: AtlasData }) {
             sample={sample}
             measurements={data.measurements}
             images={data.images}
+            granudrumSeries={data.granudrumSeries}
           />
         ))}
       </section>

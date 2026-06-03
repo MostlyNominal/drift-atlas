@@ -728,6 +728,115 @@ figcaption strong {
   margin-top: 26px;
 }
 
+.compare-visuals {
+  margin: 26px 0 32px;
+}
+
+.compare-visuals h2 {
+  margin: 0 0 16px;
+  font-size: 1.28rem;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.chart-card,
+.chart-empty {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.chart-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.chart-title {
+  display: grid;
+  gap: 5px;
+}
+
+.chart-title h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.chart-title p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.chart-frame {
+  min-width: 0;
+  width: 100%;
+  min-height: 300px;
+}
+
+.svg-chart-frame {
+  overflow-x: auto;
+}
+
+.svg-chart-frame svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+}
+
+.chart-empty {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  min-height: 180px;
+  padding: 18px;
+  box-shadow: none;
+}
+
+.chart-empty p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.chart-footnotes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.chart-direct-label {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chart-axis {
+  stroke: var(--line-strong);
+  stroke-width: 1.4;
+}
+
+.chart-gridline {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
 .bar-group {
   display: grid;
   gap: 10px;

@@ -51,6 +51,43 @@ export interface MethodDefinition {
   future_status: "MVP" | "Future";
 }
 
+export interface PSDCurve {
+  sample_id: string;
+  curve_id: string;
+  repeat: number;
+  x_um: number[];
+  volume_percent: number[];
+  cumulative_percent: number[];
+}
+
+export interface TapCurvePoint {
+  tap: number;
+  density_g_cm3: number;
+}
+
+export interface GranuTapCurve {
+  sample_id: string;
+  series_id: string;
+  repeat: number;
+  state: string;
+  points: TapCurvePoint[];
+}
+
+export interface GranuDrumPoint {
+  speed_rpm: number;
+  dynamic_angle_deg: number;
+  cohesion_index: number;
+  direction: "up" | "down" | string;
+}
+
+export interface GranuDrumSeries {
+  sample_id: string;
+  test_type: "first_avalanche" | "speed_hysteresis" | string;
+  repeat: number;
+  values?: number[];
+  points?: GranuDrumPoint[];
+}
+
 export interface Stat {
   n: number;
   mean: number | null;
@@ -104,6 +141,9 @@ export interface AtlasData {
   measurements: Measurement[];
   images: AtlasImage[];
   methods: MethodDefinition[];
+  psdCurves: PSDCurve[];
+  granutapCurves: GranuTapCurve[];
+  granudrumSeries: GranuDrumSeries[];
 }
 
 export interface SummaryCounts {
@@ -111,4 +151,22 @@ export interface SummaryCounts {
   alloyCount: number;
   methodCount: number;
   measurementCount: number;
+}
+
+export interface RelationshipRow {
+  sample_id: string;
+  display_name: string;
+  alloy: string;
+  powder_state: string;
+  x: number | null;
+  y: number | null;
+  xN: number;
+  yN: number;
+}
+
+export interface HausnerQualityBand {
+  label: "Excellent" | "Good" | "Passable" | "Poor";
+  min: number;
+  max: number;
+  color: string;
 }

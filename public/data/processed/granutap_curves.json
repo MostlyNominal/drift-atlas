@@ -1,0 +1,114 @@
+[
+  {
+    "sample_id": "IN718-AR",
+    "series_id": "IN718-AR-GT-R1",
+    "repeat": 1,
+    "state": "as-received",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.18 },
+      { "tap": 25, "density_g_cm3": 4.42 },
+      { "tap": 50, "density_g_cm3": 4.55 },
+      { "tap": 100, "density_g_cm3": 4.68 },
+      { "tap": 250, "density_g_cm3": 4.82 },
+      { "tap": 500, "density_g_cm3": 4.89 }
+    ]
+  },
+  {
+    "sample_id": "IN718-AR",
+    "series_id": "IN718-AR-GT-R2",
+    "repeat": 2,
+    "state": "as-received",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.16 },
+      { "tap": 25, "density_g_cm3": 4.4 },
+      { "tap": 50, "density_g_cm3": 4.53 },
+      { "tap": 100, "density_g_cm3": 4.69 },
+      { "tap": 250, "density_g_cm3": 4.84 },
+      { "tap": 500, "density_g_cm3": 4.93 }
+    ]
+  },
+  {
+    "sample_id": "IN718-COND",
+    "series_id": "IN718-COND-GT-R1",
+    "repeat": 1,
+    "state": "conditioned",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.1 },
+      { "tap": 25, "density_g_cm3": 4.31 },
+      { "tap": 50, "density_g_cm3": 4.45 },
+      { "tap": 100, "density_g_cm3": 4.61 },
+      { "tap": 250, "density_g_cm3": 4.76 },
+      { "tap": 500, "density_g_cm3": 4.86 }
+    ]
+  },
+  {
+    "sample_id": "IN718-COND",
+    "series_id": "IN718-COND-GT-R2",
+    "repeat": 2,
+    "state": "conditioned",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.12 },
+      { "tap": 25, "density_g_cm3": 4.33 },
+      { "tap": 50, "density_g_cm3": 4.47 },
+      { "tap": 100, "density_g_cm3": 4.62 },
+      { "tap": 250, "density_g_cm3": 4.78 },
+      { "tap": 500, "density_g_cm3": 4.88 }
+    ]
+  },
+  {
+    "sample_id": "NIALBR-AR",
+    "series_id": "NIALBR-AR-GT-R1",
+    "repeat": 1,
+    "state": "as-received",
+    "points": [
+      { "tap": 0, "density_g_cm3": 3.22 },
+      { "tap": 25, "density_g_cm3": 3.42 },
+      { "tap": 50, "density_g_cm3": 3.54 },
+      { "tap": 100, "density_g_cm3": 3.66 },
+      { "tap": 250, "density_g_cm3": 3.78 },
+      { "tap": 500, "density_g_cm3": 3.86 }
+    ]
+  },
+  {
+    "sample_id": "NIALBR-AR",
+    "series_id": "NIALBR-AR-GT-R2",
+    "repeat": 2,
+    "state": "as-received",
+    "points": [
+      { "tap": 0, "density_g_cm3": 3.2 },
+      { "tap": 25, "density_g_cm3": 3.41 },
+      { "tap": 50, "density_g_cm3": 3.55 },
+      { "tap": 100, "density_g_cm3": 3.68 },
+      { "tap": 250, "density_g_cm3": 3.8 },
+      { "tap": 500, "density_g_cm3": 3.88 }
+    ]
+  },
+  {
+    "sample_id": "C103-COND",
+    "series_id": "C103-COND-GT-R1",
+    "repeat": 1,
+    "state": "conditioned",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.92 },
+      { "tap": 25, "density_g_cm3": 5.12 },
+      { "tap": 50, "density_g_cm3": 5.27 },
+      { "tap": 100, "density_g_cm3": 5.42 },
+      { "tap": 250, "density_g_cm3": 5.52 },
+      { "tap": 500, "density_g_cm3": 5.58 }
+    ]
+  },
+  {
+    "sample_id": "C103-COND",
+    "series_id": "C103-COND-GT-R2",
+    "repeat": 2,
+    "state": "conditioned",
+    "points": [
+      { "tap": 0, "density_g_cm3": 4.95 },
+      { "tap": 25, "density_g_cm3": 5.15 },
+      { "tap": 50, "density_g_cm3": 5.3 },
+      { "tap": 100, "density_g_cm3": 5.45 },
+      { "tap": 250, "density_g_cm3": 5.55 },
+      { "tap": 500, "density_g_cm3": 5.61 }
+    ]
+  }
+]
