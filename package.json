@@ -3,20 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Static-first powder characterisation database & visualisation website for metallic powders",
+  "description": "Static-first sample atlas and powder passport website for metallic powders",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview --base /drift-atlas/",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "data": "python scripts/process_data.py",
     "test": "vitest run"
   },
   "dependencies": {
-    "arquero": "^7.2.0",
-    "echarts": "^5.5.1",
-    "echarts-for-react": "^3.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0"
@@ -29,6 +25,5 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
     "vitest": "^2.0.5"
-  },
-  "//deps_notes": "DuckDB-WASM (@duckdb/duckdb-wasm) is an optional add-on for SQL-style querying of Parquet; Arquero covers MVP needs without WASM bundle weight. Plotly.js can replace ECharts if preferred."
+  }
 }

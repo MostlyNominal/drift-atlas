@@ -1,82 +1,114 @@
-// Shared types mirroring the processed JSON emitted by scripts/process_data.py
+export interface Sample {
+  sample_id: string;
+  display_name: string;
+  alloy: string;
+  supplier: string;
+  batch: string;
+  lot_number: string;
+  powder_state: string;
+  psd_class: string;
+  storage_condition: string;
+  conditioning: string;
+  tags: string[];
+  notes: string;
+  featured?: boolean;
+}
+
+export interface Measurement {
+  measurement_id: string;
+  sample_id: string;
+  method: string;
+  metric: string;
+  value: number;
+  unit: string;
+  repeat: number;
+  date: string;
+  method_version: string;
+  instrument: string;
+  notes: string;
+}
+
+export interface AtlasImage {
+  image_id: string;
+  sample_id: string;
+  image_path: string;
+  thumbnail_path: string;
+  type: string;
+  magnification: string;
+  detector: string;
+  accelerating_voltage_kV: number;
+  working_distance_mm: number;
+  notes: string;
+}
+
+export interface MethodDefinition {
+  method_id: string;
+  name: string;
+  purpose: string;
+  version: string;
+  key_parameters: string[];
+  interpretation_notes: string[];
+  future_status: "MVP" | "Future";
+}
 
 export interface Stat {
   n: number;
   mean: number | null;
-  sd: number | null; // null when n < 2  -> hide error bars
+  sd: number | null;
   sem: number | null;
 }
 
-export interface RunMetadata {
-  material: string | null;
-  supplier: string | null;
-  nominal_psd: string | null;
-  conditioning: string | null;
-  humidity_pct: number | null;
-  reuse_cycle: number | null;
-  operator: string | null;
-  instrument: string | null;
-  run_datetime: string | null;
-  test_mode: string | null;
+export interface MetricStat extends Stat {
+  key: MetricKey;
+  label: string;
+  unit: string;
+  values: number[];
 }
 
-export interface RunIndexEntry {
-  run_id: string;
-  sample_id: string;
-  batch_id: string;
+export type MetricKey =
+  | "d10"
+  | "d50"
+  | "d90"
+  | "span"
+  | "moisture"
+  | "bulkDensity"
+  | "tappedDensity"
+  | "hausnerRatio"
+  | "carrIndex";
+
+export interface MetricDefinition {
+  key: MetricKey;
+  label: string;
   method: string;
-  n: number;
-  metadata: RunMetadata;
+  sourceMetric: string | null;
+  unit: string;
+  precision: number;
 }
 
-export interface RunSummary {
-  method: string;
-  sample_id: string;
-  batch_id: string;
-  metadata: RunMetadata;
-  stats: Record<string, Stat>;
+export interface SampleKeyMetrics {
+  d10: MetricStat;
+  d50: MetricStat;
+  d90: MetricStat;
+  span: MetricStat;
+  moisture: MetricStat;
+  bulkDensity: MetricStat;
+  tappedDensity: MetricStat;
+  hausnerRatio: MetricStat;
+  carrIndex: MetricStat;
+  semImageCount: number;
+  availableMethods: string[];
 }
 
-export interface RunDoc extends RunIndexEntry {
-  raw_file: { original_name: string; sha256: string; path: string };
-  repeats: Record<string, unknown>[];
-  children: Record<string, Record<string, unknown>[]>;
-  detected: Record<string, unknown>;
+export interface AtlasData {
+  samples: Sample[];
+  measurements: Measurement[];
+  images: AtlasImage[];
+  methods: MethodDefinition[];
 }
 
-export interface Batch {
-  batch_id: string;
-  conditioning?: string;
-  humidity_pct?: number;
-  reuse_cycle?: number;
-  [k: string]: unknown;
-}
-
-export interface Sample {
-  sample_id: string;
-  material?: string;
-  supplier?: string;
-  nominal_psd?: string;
-  batches: Batch[];
-  [k: string]: unknown;
-}
-
-export interface Manifest {
-  generated_at: string;
-  n_samples: number;
-  n_runs: number;
-  methods: string[];
-  warnings: string[];
-}
-
-export interface SemImage {
-  sample_id: string | null;
-  run_id: string | null;
-  magnification: number | null;
-  detector: string | null;
-  accelerating_voltage_kV: number | null;
-  working_distance_mm: number | null;
-  notes: string | null;
-  image_path: string;
-  thumbnail: string;
+export interface SummaryCounts {
+  sampleCount: number;
+  alloyCount: number;
+  methodCount: number;
+  measurementCount: number;
 }

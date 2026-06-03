@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 //   https://mostlynominal.github.io/drift-atlas/
 // so the base path MUST be "/drift-atlas/" (with leading and trailing slash).
 // All asset URLs and data fetches resolve against import.meta.env.BASE_URL,
-// which Vite sets from this value — so links work on Pages, not just locally.
+// which Vite sets from this value, so links work on Pages, not just locally.
 //
 // Override only if you fork to a different repo name:
 //   VITE_BASE=/your-repo/ npm run build

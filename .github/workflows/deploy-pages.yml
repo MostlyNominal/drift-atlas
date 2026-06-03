@@ -1,15 +1,13 @@
 name: Deploy to GitHub Pages
 
 # Deploys the static site to GitHub Pages on every push to main.
-# REQUIRED ONE-TIME SETUP in the repo:
-#   Settings → Pages → Build and deployment → Source = "GitHub Actions"
+# Required one-time setup in the repo:
+#   Settings -> Pages -> Build and deployment -> Source = "GitHub Actions"
 # The site will be served at https://<owner>.github.io/drift-atlas/
 
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "data/raw/**"   # raw-only pushes trigger process-data, which re-pushes
   workflow_dispatch:
 
 permissions:
@@ -17,7 +15,7 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment; don't cancel an in-progress production deploy.
+# Allow one concurrent deployment; do not cancel an in-progress production deploy.
 concurrency:
   group: pages
   cancel-in-progress: false

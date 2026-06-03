@@ -1,34 +1,52 @@
-// Client-side statistics. Mirrors scripts/parsers/common.py exactly so the
-// website can also compute stats from raw repeats uploaded in the browser.
 import type { Stat } from "./types";
 
-export function summarise(values: (number | null | undefined)[]): Stat {
-  const xs = values.filter((v): v is number => typeof v === "number" && !Number.isNaN(v));
+export function calculateMeanSDN(values: (number | null | undefined)[]): Stat {
+  const xs = values.filter((value): value is number => {
+    return typeof value === "number" && Number.isFinite(value);
+  });
   const n = xs.length;
-  if (n === 0) return { n: 0, mean: null, sd: null, sem: null };
-  const mean = xs.reduce((a, b) => a + b, 0) / n;
-  if (n < 2) return { n, mean, sd: null, sem: null };
-  const variance = xs.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1); // ddof=1
+
+  if (n === 0) {
+    return { n: 0, mean: null, sd: null, sem: null };
+  }
+
+  const mean = xs.reduce((sum, value) => sum + value, 0) / n;
+
+  if (n === 1) {
+    return { n, mean, sd: null, sem: null };
+  }
+
+  const variance = xs.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (n - 1);
   const sd = Math.sqrt(variance);
   return { n, mean, sd, sem: sd / Math.sqrt(n) };
 }
 
-/** Error bars are shown ONLY when n > 1 and SD is defined. */
 export function showErrorBars(stat: Stat): boolean {
   return stat.n > 1 && stat.sd != null;
 }
 
 export function pearson(xs: number[], ys: number[]): number | null {
-  const pairs = xs.map((x, i) => [x, ys[i]]).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+  const pairs = xs
+    .map((x, index) => [x, ys[index]])
+    .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+
   const n = pairs.length;
   if (n < 2) return null;
-  const mx = pairs.reduce((s, p) => s + p[0], 0) / n;
-  const my = pairs.reduce((s, p) => s + p[1], 0) / n;
-  let num = 0, dx = 0, dy = 0;
+
+  const meanX = pairs.reduce((sum, pair) => sum + pair[0], 0) / n;
+  const meanY = pairs.reduce((sum, pair) => sum + pair[1], 0) / n;
+
+  let numerator = 0;
+  let sumXSquared = 0;
+  let sumYSquared = 0;
+
   for (const [x, y] of pairs) {
-    num += (x - mx) * (y - my);
-    dx += (x - mx) ** 2;
-    dy += (y - my) ** 2;
+    numerator += (x - meanX) * (y - meanY);
+    sumXSquared += (x - meanX) ** 2;
+    sumYSquared += (y - meanY) ** 2;
   }
-  return dx && dy ? num / Math.sqrt(dx * dy) : null;
+
+  return sumXSquared && sumYSquared
+    ? numerator / Math.sqrt(sumXSquared * sumYSquared)
+    : null;
 }
